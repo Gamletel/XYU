@@ -16,6 +16,8 @@ func Connect() error {
 		panic(err)
 	}
 
+	defer DB.Close()
+
 	err = DB.Ping()
 	if err != nil {
 		return err

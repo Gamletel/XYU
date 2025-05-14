@@ -2,6 +2,9 @@ package main
 
 import (
 	"backend/internal/db"
+	"backend/internal/handlers"
+	"backend/internal/repositories"
+	"backend/internal/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/joho/godotenv"
@@ -19,6 +22,11 @@ func main() {
 		panic(err)
 	}
 
+	//Users
+	userRepo := repositories.NewUserRepository(db.DB)
+	userService := services.NewUserService(userRepo)
+	userHandler := handlers.NewUserHandler(userService)
+
 	// Adding router
 	r := chi.NewRouter()
 
@@ -27,7 +35,11 @@ func main() {
 		w.Write([]byte("Hello World"))
 	})
 
-	r.Route("/api", func(r chi.Router) {
+	r.Group(func(r chi.Router) {
+		r.Route("/api", func(r chi.Router) {
+			r.Get("/users", userHandler.GetAllUsers)
+			r.Post("/users", userHandler.CreateUser)
+		})
 	})
 
 	http.ListenAndServe(":8080", r)
