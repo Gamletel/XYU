@@ -42,20 +42,22 @@ func main() {
 
 	r.Group(func(r chi.Router) {
 		r.Route("/api", func(r chi.Router) {
-			r.Route("/users", func(r chi.Router) {
-				r.Get("/", userHandler.GetAllUsers)
-				r.Get("/by-email", userHandler.GetUserByEmail)
-				r.Post("/", userHandler.CreateUser)
-				r.Put("/:id", userHandler.UpdateUser)
-				r.Delete("/:id", userHandler.DeleteUser)
-			})
+			r.Route("/v1", func(r chi.Router) {
+				r.Route("/users", func(r chi.Router) {
+					r.Get("/", userHandler.GetAllUsers)
+					r.Get("/by-email", userHandler.GetUserByEmail)
+					r.Post("/", userHandler.CreateUser)
+					r.Put("/:id", userHandler.UpdateUser)
+					r.Delete("/:id", userHandler.DeleteUser)
+				})
 
-			r.Route("/todos", func(r chi.Router) {
-				r.Get("/by-title", todoHandler.GetTodoByTitle)
-				r.Get("/by-user-id", todoHandler.GetTodoByUserId)
-				r.Post("/", todoHandler.CreateTodo)
-				r.Put("/:id", todoHandler.UpdateTodo)
-				r.Delete("/:id", todoHandler.DeleteTodo)
+				r.Route("/todos", func(r chi.Router) {
+					r.Get("/by-title", todoHandler.GetTodoByTitle)
+					r.Get("/by-user-id", todoHandler.GetTodoByUserId)
+					r.Post("/", todoHandler.CreateTodo)
+					r.Put("/:id", todoHandler.UpdateTodo)
+					r.Delete("/:id", todoHandler.DeleteTodo)
+				})
 			})
 		})
 	})

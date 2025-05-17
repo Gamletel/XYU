@@ -4,6 +4,7 @@ import (
 	"backend/internal/models"
 	"backend/internal/services"
 	"encoding/json"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 	"net/http"
 )
@@ -33,7 +34,7 @@ func (h UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := validate.Struct(&user); err != nil {
+	if err := validate.Struct(user); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -51,11 +52,7 @@ func (h UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h UserHandler) GetUserByEmail(w http.ResponseWriter, r *http.Request) {
-	var email string
-	if err := json.NewDecoder(r.Body).Decode(&email); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	email := chi.URLParam(r, "email")
 
 	res, err := h.service.GetUserByEmail(email)
 	if err != nil {
@@ -75,7 +72,7 @@ func (h UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := validate.Struct(&user); err != nil {
+	if err := validate.Struct(user); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -93,7 +90,7 @@ func (h UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 func (h UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	var id int
-	if err := json.NewDecoder(r.Body).Decode(&id); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(id); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

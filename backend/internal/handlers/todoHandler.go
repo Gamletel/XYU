@@ -69,7 +69,7 @@ func (h TodoHandler) GetTodoByUserId(w http.ResponseWriter, r *http.Request) {
 
 func (h TodoHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	var todo models.Todo
-	err := json.NewDecoder(r.Body).Decode(&todo)
+	err := json.NewDecoder(r.Body).Decode(todo)
 	if err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
 		return
@@ -87,7 +87,7 @@ func (h TodoHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
 
 func (h TodoHandler) UpdateTodo(w http.ResponseWriter, r *http.Request) {
 	var todo models.Todo
-	err := json.NewDecoder(r.Body).Decode(&todo)
+	err := json.NewDecoder(r.Body).Decode(todo)
 	if err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
 		return
