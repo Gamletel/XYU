@@ -22,6 +22,18 @@ services:
       POSTGRES_DB: xyu
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  migrate:
+    image: migrate/migrate
+    command: sh -c "migrate -path=/migrations/ -database '$$DATABASE_URL' up"
+    environment:
+      DATABASE_URL: postgres://admin:password@db:5432/xyu?sslmode=disable
+    volumes:
+      - ./backend/db/migrations:/migrations
+    depends_on:
+      - db
 
   redis:
     image: redis:alpine
@@ -36,7 +48,7 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8081:8081
+      - "8081:8081"
 
 volumes:
   postgres_data:
