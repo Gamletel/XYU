@@ -1,5 +1,4 @@
-# Stage 1: Build
-FROM golang:1.22-alpine AS builder
+FROM golang:alpine AS builder
 
 WORKDIR /app
 
@@ -10,17 +9,19 @@ RUN go mod download
 
 COPY backend/. .
 
-RUN CGO_ENABLED=0 go build -o /server cmd/server/main.go
+RUN CGO_ENABLED=0 go build -o /server ./cmd/server/main.go
 
 FROM alpine:3.19
 
 WORKDIR /app
 
-RUN apk --no-cache add ca-certificates tzdata
+RUN apk add --no-cache curl && \
+    curl -o /migrate https://github.com/golang-migrate/migrate/releases/latest/download/migrate.linux-amd64  && \
+    chmod +x /migrate
 
 COPY --from=builder /server /server
-#COPY --from=builder /app/config/ ./config/
-#COPY --from=builder /app/migrations/ ./migrations/
+#COPY --from=builder /app/.env /app/.env
+COPY backend/db/migrations /migrations
 
 EXPOSE 8080
 
