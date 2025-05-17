@@ -185,3 +185,33 @@ body {
 .container.active .toggle-right {
   transform: translateX(200%);
 }
+
+.file-upload-container {
+  display: flex;
+  align-items: center;
+}
+
+.file-upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background-color: #eee;
+  color: #a9a9a9;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  width: 100%;
+}
+
+.file-upload-button:hover {
+  background-color: #e2e2e2;
+}
+
+.file-upload-button svg {
+  fill: #a9a9a9;
+}
+
+#file-upload {
+  display: none;
+}
