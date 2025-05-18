@@ -1,0 +1,211 @@
+swagger: "2.0"
+info:
+  title: XUI
+  description: API for Users and Todos
+  version: 1.0.0
+host: 127.0.0.1:8080
+basePath: /api/v1
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /users:
+    get:
+      summary: "Get all users"
+      tags:
+        - "users"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/User"
+
+    post:
+      summary: "Create a new user"
+      tags:
+        - "users"
+      parameters:
+        - in: body
+          name: user
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        201:
+          description: "Created"
+    put:
+      summary: "Update user"
+      tags:
+        - "users"
+      parameters:
+        - in: body
+          name: user
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        200:
+          description: "Updated"
+    delete:
+      summary: "Delete user"
+      tags:
+        - "users"
+      parameters:
+        - in: body
+          name: user
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        200:
+          description: "Deleted"
+
+  /users/get-by-email:
+    get:
+      summary: "Find user by email"
+      tags:
+        - "users"
+      parameters:
+        - name: email
+          in: query
+          type: string
+          required: true
+      responses:
+        200:
+          description: "User found"
+          schema:
+            $ref: "#/definitions/User"
+        404:
+          description: "User not found"
+
+  /todos:
+    post:
+      summary: "Create a new todo"
+      tags:
+        - "todos"
+      parameters:
+        - in: body
+          name: todo
+          required: true
+          schema:
+            $ref: "#/definitions/Todo"
+      responses:
+        201:
+          description: "Created"
+    put:
+      summary: "Update todo"
+      tags:
+        - "todos"
+      parameters:
+        - in: body
+          name: todo
+          required: true
+          schema:
+            $ref: "#/definitions/Todo"
+      responses:
+        200:
+          description: "Updated"
+    delete:
+      summary: "Delete todo"
+      tags:
+        - "todos"
+      parameters:
+        - in: body
+          name: todo
+          required: true
+          schema:
+            $ref: "#/definitions/Todo"
+      responses:
+        200:
+          description: "Deleted"
+  /todos/by-title:
+    get:
+      summary: "Get todos by title and userId"
+      tags:
+        - "todos"
+      parameters:
+        - name: title
+          in: query
+          description: "Todo title"
+          required: true
+          type: string
+        - name: userId
+          in: query
+          description: "User (creator) id"
+          required: true
+          type: integer
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Todo"
+  /todos/by-user-id:
+    get:
+      summary: "Get todos by userId"
+      tags:
+        - "todos"
+      parameters:
+        - name: userId
+          in: query
+          description: "User (creator) id"
+          required: true
+          type: integer
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Todo"
+definitions:
+  User:
+    type: object
+    properties:
+      id:
+        type: integer
+      email:
+        type: string
+        format: email
+      login:
+        type: string
+        minLength: 5
+        maxLength: 20
+      password:
+        type: string
+        minLength: 8
+      name:
+        type: string
+      surname:
+        type: string
+      avatar:
+        type: string
+        format: uri
+
+  Todo:
+    type: object
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      text:
+        type: string
+      image:
+        type: string
+        format: uri
+      user_id:
+        type: integer
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
