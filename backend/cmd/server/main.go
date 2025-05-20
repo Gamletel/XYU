@@ -3,6 +3,7 @@ package main
 import (
 	"backend/internal/db"
 	"backend/internal/handlers"
+	"backend/internal/middlewares"
 	"backend/internal/repositories"
 	"backend/internal/services"
 	"github.com/go-chi/chi/v5"
@@ -42,7 +43,12 @@ func main() {
 
 	r.Group(func(r chi.Router) {
 		r.Route("/api", func(r chi.Router) {
+			r.Post("/login", handlers.Login)
+			r.Post("/register", handlers.Register)
+
 			r.Route("/v1", func(r chi.Router) {
+				r.Use(middlewares.Auth)
+
 				r.Route("/users", func(r chi.Router) {
 					r.Get("/", userHandler.GetAllUsers)
 					r.Get("/by-email", userHandler.GetUserByEmail)
