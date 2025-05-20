@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 	"net/http"
+	"strconv"
 )
 
 type UserHandler struct {
@@ -89,11 +90,8 @@ func (h UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	var id int
-	if err := json.NewDecoder(r.Body).Decode(id); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	idStr := chi.URLParam(r, "id")
+	id, _ := strconv.Atoi(idStr)
 
 	res, err := h.service.DeleteUser(id)
 	if err != nil {

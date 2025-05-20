@@ -6,6 +6,7 @@ import (
 	"backend/internal/repositories"
 	"backend/pkg/utils"
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -39,20 +40,32 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	userRepo := repositories.NewUserRepository(db.DB)
 	user, err := userRepo.GetUserByEmail(req.Email)
-
-	switch {
-	case err != nil:
-		http.Error(w, "Invalid email or password", http.StatusBadRequest)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
-	case !utils.CheckPasswordHash(req.Password, user.Password):
-		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+	}
+	password, err := userRepo.GetUserPassword(user.Id)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if !utils.CheckPasswordHash(*password, req.Password) {
+		http.Error(w, fmt.Sprintf("wrong email/password %v, %v", req.Password, *password), http.StatusBadRequest)
 		return
 	}
 
 	token, err := utils.GenerateToken(user.Email)
 
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+
 	res := loginResponse{
 		User: UserDTO{
 			Login: user.Login,
@@ -73,14 +86,25 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	userRepo := repositories.NewUserRepository(db.DB)
 	user, err := userRepo.GetUserByEmail(req.Email)
-	if err != nil {
-		http.Error(w, "Email is already used", http.StatusBadRequest)
+	if user != nil {
+		http.Error(w, "User is already exist", http.StatusBadRequest)
 		return
 	}
 
-	user, err = userRepo.CreateUser(&req.User)
+	passwordHashed, _ := utils.HashPassword(req.Password)
+
+	userReq := models.User{
+		Email:    req.Email,
+		Login:    req.Login,
+		Password: passwordHashed,
+		Name:     req.Name,
+		Surname:  req.Surname,
+		Avatar:   req.Avatar,
+	}
+
+	user, err = userRepo.CreateUser(&userReq)
 	if err != nil {
-		http.Error(w, "User already exists", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 

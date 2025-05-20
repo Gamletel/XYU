@@ -3,21 +3,14 @@ package main
 import (
 	"backend/internal/db"
 	"backend/internal/handlers"
-	"backend/internal/middlewares"
 	"backend/internal/repositories"
 	"backend/internal/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/joho/godotenv"
-	"log"
 	"net/http"
 )
 
 func main() {
-	if err := godotenv.Load(".env"); err != nil {
-		log.Print("No .env file found")
-	}
-
 	// Connect to DB
 	if err := db.Connect(); err != nil {
 		panic(err)
@@ -47,22 +40,22 @@ func main() {
 			r.Post("/register", handlers.Register)
 
 			r.Route("/v1", func(r chi.Router) {
-				r.Use(middlewares.Auth)
+				//r.Use(middlewares.Auth)
 
 				r.Route("/users", func(r chi.Router) {
 					r.Get("/", userHandler.GetAllUsers)
-					r.Get("/by-email", userHandler.GetUserByEmail)
+					r.Get("/by-email/{email}", userHandler.GetUserByEmail)
 					r.Post("/", userHandler.CreateUser)
-					r.Put("/:id", userHandler.UpdateUser)
-					r.Delete("/:id", userHandler.DeleteUser)
+					r.Put("/{id}", userHandler.UpdateUser)
+					r.Delete("/{id}", userHandler.DeleteUser)
 				})
 
 				r.Route("/todos", func(r chi.Router) {
 					r.Get("/by-title", todoHandler.GetTodoByTitle)
 					r.Get("/by-user-id", todoHandler.GetTodoByUserId)
 					r.Post("/", todoHandler.CreateTodo)
-					r.Put("/:id", todoHandler.UpdateTodo)
-					r.Delete("/:id", todoHandler.DeleteTodo)
+					r.Put("/{id}", todoHandler.UpdateTodo)
+					r.Delete("/{id}", todoHandler.DeleteTodo)
 				})
 			})
 		})
