@@ -165,6 +165,53 @@ paths:
             type: array
             items:
               $ref: "#/definitions/Todo"
+  /register:
+    post:
+      summary: "Registration"
+      tags:
+        - "auth"
+      parameters:
+        - in: body
+          name: user
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        200:
+          description: "Registered"
+          schema:
+            user:
+              $ref: "#/definitions/UserResponse"
+  /login:
+    post:
+      summary: "Login"
+      tags:
+        - "auth"
+      parameters:
+        - in: body
+          name: user
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+              password:
+                type: string
+                minLength: 8
+      responses:
+        200:
+          description: "Login success"
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+              user:
+                $ref: "#/definitions/UserResponse"
+
+
 definitions:
   User:
     type: object
@@ -188,7 +235,25 @@ definitions:
       avatar:
         type: string
         format: uri
-
+  UserResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+      email:
+        type: string
+        format: email
+      login:
+        type: string
+        minLength: 5
+        maxLength: 20
+      name:
+        type: string
+      surname:
+        type: string
+      avatar:
+        type: string
+        format: uri
   Todo:
     type: object
     properties:
