@@ -3,11 +3,14 @@ package main
 import (
 	"backend/internal/db"
 	"backend/internal/handlers"
+	"backend/internal/middlewares"
 	"backend/internal/repositories"
 	"backend/internal/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/httprate"
 	"net/http"
+	"time"
 )
 
 func main() {
@@ -16,7 +19,7 @@ func main() {
 		panic(err)
 	}
 
-	//Users
+	// Users
 	userRepo := repositories.NewUserRepository(db.DB)
 	userService := services.NewUserService(userRepo)
 	userHandler := handlers.NewUserHandler(userService)
@@ -30,6 +33,8 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
+	r.Use(httprate.LimitByIP(100, time.Minute))
+
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello World"))
 	})
@@ -40,7 +45,7 @@ func main() {
 			r.Post("/register", handlers.Register)
 
 			r.Route("/v1", func(r chi.Router) {
-				//r.Use(middlewares.Auth)
+				r.Use(middlewares.Auth)
 
 				r.Route("/users", func(r chi.Router) {
 					r.Get("/", userHandler.GetAllUsers)
